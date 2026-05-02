@@ -1,44 +1,41 @@
 package config
 
 import (
+	"os"
+
 	"github.com/spf13/viper"
 )
 
-// Config stores all configuration of the application.
 type Config struct {
-	ServerPort       string `mapstructure:"PORT"`
-	MongoURI         string `mapstructure:"MONGO_URI"`
-	DBName           string `mapstructure:"DB_NAME"`
-	JWTSecretKey     string `mapstructure:"JWT_SECRET_KEY"`
-	JWTExpirationHours int    `mapstructure:"JWT_EXPIRATION_HOURS"`
-	EnableCache      bool   `mapstructure:"ENABLE_CACHE"`
-	RedisAddr        string `mapstructure:"REDIS_ADDR"`
-	RedisPassword    string `mapstructure:"REDIS_PASSWORD"`
-	LogLevel      string `mapstructure:"LOG_LEVEL"`
-	LogFormat     string `mapstructure:"LOG_FORMAT"`
+	ServerPort         string `mapstructure:"port"`
+	MongoURI           string `mapstructure:"mongo_uri"`
+	DBName             string `mapstructure:"db_name"`
+	JWTSecretKey       string `mapstructure:"jwt_secret_key"`
+	JWTExpirationHours int    `mapstructure:"jwt_expiration_hours"`
+	EnableCache        bool   `mapstructure:"enable_cache"`
+	RedisAddr          string `mapstructure:"redis_addr"`
+	RedisPassword      string `mapstructure:"redis_password"`
+	LogLevel           string `mapstructure:"log_level"`
+	LogFormat          string `mapstructure:"log_format"`
 }
 
-// LoadConfig reads configuration from file or environment variables.
 func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
-
-	viper.AutomaticEnv()
-
-	// Set default values
-	viper.SetDefault("PORT", "8080")
-	viper.SetDefault("ENABLE_CACHE", false)
-	viper.SetDefault("JWT_EXPIRATION_HOURS", 72)
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return
-		}
-	}
+	viper.SetDefault("port", getEnv("PORT", "8080"))
+	viper.SetDefault("mongo_uri", getEnv("MONGO_URI", ""))
+	viper.SetDefault("db_name", getEnv("DB_NAME", "much_todo_db"))
+	viper.SetDefault("jwt_secret_key", getEnv("JWT_SECRET_KEY", ""))
+	viper.SetDefault("jwt_expiration_hours", 72)
+	viper.SetDefault("enable_cache", false)
+	viper.SetDefault("log_level", getEnv("LOG_LEVEL", "DEBUG"))
+	viper.SetDefault("log_format", getEnv("LOG_FORMAT", "json"))
 
 	err = viper.Unmarshal(&config)
 	return
 }
 
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}

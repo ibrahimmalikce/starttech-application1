@@ -1,0 +1,9 @@
+.git
+.gitignore
+*.md
+evidence/
+kubernetes/
+scripts/
+.env
+.env.*
+!.env.example
