@@ -44,7 +44,7 @@ jobs:
       - name: Build production bundle
         working-directory: frontend
         env:
-          REACT_APP_API_URL: /api/v1
+          VITE_API_URL: /api/v1
           CI: false
         run: npm run build
 
